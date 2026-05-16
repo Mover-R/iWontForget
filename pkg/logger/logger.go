@@ -1,47 +1,84 @@
 package logger
 
 import (
-	"fmt"
-
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
-
-	"a.yandex-team.ru/library/go/core/log"
-	"a.yandex-team.ru/library/go/core/log/zap"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-const defaultName = "http"
+const (
+	defaultName  = "app"
+	defaultLevel = "info"
+)
 
 type Logger struct {
-	Level      log.Level
-	Name       string
-	UseConsole bool
-	LogrLogger logr.Logger
-	ZapLogger  *zap.Logger
+	logr logr.Logger
+	zap  *zap.Logger
 }
 
-func (l *Logger) GetLogr() logr.Logger {
-	return l.LogrLogger
+type Config struct {
+	Name        string
+	Level       string
+	Development bool
 }
 
-func (l *Logger) GetZap() *zap.Logger {
-	return l.ZapLogger
+func (l *Logger) Logr() logr.Logger {
+	return l.logr
 }
 
-func GetLogger(options ...LogOption) (*Logger, error) {
-	s := &Logger{}
-	for _, opt := range options {
-		opt(s)
+func (l *Logger) Zap() *zap.Logger {
+	return l.zap
+}
+
+func (l *Logger) Sync() error {
+	if l.zap == nil {
+		return nil
 	}
-	var err error
-	if s.UseConsole {
-		s.ZapLogger, err = zap.New(zap.CLIConfig(s.Level))
-	} else {
-		s.ZapLogger, err = zap.NewDeployLogger(s.Level)
+	return l.zap.Sync()
+}
+
+func NewLogger(cfg Config) (*Logger, error) {
+	if cfg.Name == "" {
+		cfg.Name = defaultName
 	}
+	if cfg.Level == "" {
+		cfg.Level = defaultLevel
+	}
+
+	zapCfg := zap.NewProductionConfig()
+	if cfg.Development {
+		zapCfg = zap.NewDevelopmentConfig()
+	}
+
+	zapLevel, err := zapcore.ParseLevel(cfg.Level)
 	if err != nil {
-		return nil, fmt.Errorf("failed to init zap logger: %w", err)
+		return nil, err
 	}
-	s.LogrLogger = zapr.NewLogger(s.ZapLogger.L).WithName(s.Name)
-	return s, nil
+	zapCfg.Level = zap.NewAtomicLevelAt(zapLevel)
+
+	zapLogger, err := zapCfg.Build()
+	if err != nil {
+		return nil, err
+	}
+
+	l := &Logger{
+		logr: zapr.NewLogger(zapLogger).WithName(cfg.Name),
+		zap:  zapLogger,
+	}
+
+	return l, nil
+}
+
+func NewLoggerWithOptions(opts ...Option) (*Logger, error) {
+	cfg := Config{
+		Name:  defaultName,
+		Level: defaultLevel,
+	}
+
+	for _, opt := range opts {
+		opt(&cfg)
+	}
+
+	return NewLogger(cfg)
 }

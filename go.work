@@ -1,6 +1,7 @@
 go 1.23.12
 
 use (
+	./pkg
 	./services/ai-service
 	./services/event-service
 	./services/frinds-service

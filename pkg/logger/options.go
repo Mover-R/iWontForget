@@ -1,26 +1,21 @@
 package logger
 
-import (
-	"cmp"
-	"log"
-)
+type Option func(l *Config)
 
-type LogOption func(l *Logger)
-
-func WithName(name string) LogOption {
-	return func(l *Logger) {
-		l.Name = cmp.Or(name, string(defaultName))
+func WithName(name string) Option {
+	return func(l *Config) {
+		l.Name = name
 	}
 }
 
-func WithLevel(level log.Level) LogOption {
-	return func(l *Logger) {
+func WithLevel(level string) Option {
+	return func(l *Config) {
 		l.Level = level
 	}
 }
 
-func WithConsoleOption(useConsole bool) LogOption {
-	return func(l *Logger) {
-		l.UseConsole = useConsole
+func WithDevelopment(development bool) Option {
+	return func(l *Config) {
+		l.Development = development
 	}
 }
