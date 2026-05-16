@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package users.v1;
+
+option go_package = "github.com/tugovd/iwontforget/proto/users/v1;usersv1";
+
+service UserService {
+  rpc GetOrCreateUser(GetOrCreateUserRequest) returns (GetOrCreateUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+}
+
+message GetOrCreateUserRequest {
+  string telegram_id       = 1;
+  string telegram_username = 2;
+  string first_name        = 3;
+  string last_name         = 4;
+  string language_code     = 5;
+}
+
+message GetOrCreateUserResponse {
+  User user    = 1;
+  bool created = 2;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message UpdateUserRequest {
+  string user_id       = 1;
+  optional string timezone = 2;
+  optional string language = 3;
+}
+
+message UpdateUserResponse {
+  User user = 1;
+}
+
+message User {
+  string user_id           = 1;
+  string telegram_id       = 2;
+  string telegram_username = 3;
+  string first_name        = 4;
+  string last_name         = 5;
+  string language_code     = 6;
+  string timezone          = 7;
+  string created_at        = 8; // RFC3339
+}

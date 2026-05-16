@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package wishlist.v1;
+
+option go_package = "github.com/tugovd/iwontforget/proto/wishlist/v1;wishlistv1";
+
+service WishlistService {
+  rpc CreateWish(CreateWishRequest) returns (CreateWishResponse);
+  rpc ListWishes(ListWishesRequest) returns (ListWishesResponse);
+  rpc GetWish(GetWishRequest) returns (GetWishResponse);
+  rpc UpdateWish(UpdateWishRequest) returns (UpdateWishResponse);
+  rpc DeleteWish(DeleteWishRequest) returns (DeleteWishResponse);
+}
+
+message CreateWishRequest {
+  string user_id    = 1;
+  string name       = 2;
+  string category   = 3;
+  int64  price_min  = 4; // in minor currency units (kopecks/cents)
+  int64  price_max  = 5;
+  string url        = 6;
+  string notes      = 7;
+}
+
+message CreateWishResponse {
+  Wish wish = 1;
+}
+
+message ListWishesRequest {
+  string user_id   = 1;
+  int32  page      = 2;
+  int32  page_size = 3;
+}
+
+message ListWishesResponse {
+  repeated Wish wishes = 1;
+  int32 total          = 2;
+}
+
+message GetWishRequest {
+  string wish_id = 1;
+  string user_id = 2;
+}
+
+message GetWishResponse {
+  Wish wish = 1;
+}
+
+message UpdateWishRequest {
+  string wish_id          = 1;
+  string user_id          = 2;
+  optional string name     = 3;
+  optional string category = 4;
+  optional int64  price_min = 5;
+  optional int64  price_max = 6;
+  optional string url      = 7;
+  optional string notes    = 8;
+}
+
+message UpdateWishResponse {
+  Wish wish = 1;
+}
+
+message DeleteWishRequest {
+  string wish_id = 1;
+  string user_id = 2;
+}
+
+message DeleteWishResponse {
+  bool deleted = 1;
+}
+
+message Wish {
+  string wish_id    = 1;
+  string user_id    = 2;
+  string name       = 3;
+  string category   = 4;
+  int64  price_min  = 5;
+  int64  price_max  = 6;
+  string url        = 7;
+  string notes      = 8;
+  string status     = 9; // "active" | "reserved" | "fulfilled"
+  string created_at = 10; // RFC3339
+  string updated_at = 11; // RFC3339
+}

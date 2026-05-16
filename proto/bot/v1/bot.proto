@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package bot.v1;
+
+option go_package = "github.com/tugovd/iwontforget/proto/bot/v1;botv1";
+
+// NotificationGateway is called by Temporal activities to deliver messages to users.
+service NotificationGateway {
+  rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse);
+}
+
+message SendNotificationRequest {
+  string user_id        = 1; // Telegram user ID (string to avoid int64 JSON issues)
+  string idempotency_key = 2; // Deduplication key (e.g., "reminder:<reminder_id>:<attempt>")
+  oneof content {
+    TextNotification  text  = 3;
+    ReminderNotification reminder = 4;
+  }
+}
+
+message SendNotificationResponse {
+  bool   sent    = 1; // false if deduplicated
+  string message_id = 2; // Telegram message_id (string)
+}
+
+message TextNotification {
+  string text       = 1;
+  string parse_mode = 2; // "HTML" | "Markdown" | ""
+}
+
+message ReminderNotification {
+  string reminder_id   = 1;
+  string title         = 2;
+  string description   = 3;
+  string due_at        = 4; // RFC3339
+}

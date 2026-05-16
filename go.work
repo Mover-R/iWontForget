@@ -1,0 +1,11 @@
+go 1.23.12
+
+use (
+	./services/ai-service
+	./services/event-service
+	./services/frinds-service
+	./services/gift-service
+	./services/reminder-service
+	./services/user-service
+	./services/wishlist-service
+)

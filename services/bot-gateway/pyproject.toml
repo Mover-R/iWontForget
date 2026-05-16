@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bot-gateway"
+version = "0.1.0"
+description = "iWontForget Telegram Bot Gateway"
+requires-python = ">=3.12"
+dependencies = [
+    # Telegram bot framework (v21 — latest stable)
+    # [webhooks] adds httpx for webhook server
+    # [redis]    adds redis-py for RedisPersistence
+    "python-telegram-bot[webhooks,redis]==21.9",
+
+    # Configuration
+    "pydantic-settings==2.7.0",
+    "pydantic==2.10.4",
+
+    # Redis (rate limiting, dedup — separate from PTB's persistence)
+    "redis[hiredis]==5.2.1",
+
+    # gRPC (server + clients)
+    "grpcio==1.68.1",
+    "grpcio-tools==1.68.1",
+    "protobuf==5.29.2",
+
+    # Kafka (user activity events)
+    "aiokafka==0.11.0",
+
+    # Structured logging
+    "structlog==24.4.0",
+
+    # Prometheus metrics
+    "prometheus-client==0.21.1",
+
+    # Jinja2 for message templates
+    "Jinja2==3.1.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "pytest-asyncio==0.24.0",
+    "pytest-mock==3.14.0",
+    "fakeredis[aioredis]==2.26.2",
+    "ruff==0.8.6",
+    "mypy==1.14.1",
+    "grpc-stubs==1.53.0.5",
+    "types-protobuf==5.29.1.20241207",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["bot_gateway"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
