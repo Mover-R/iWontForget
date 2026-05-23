@@ -1,22 +1,23 @@
-FROM golang:1.23.6-alpine AS builder
+FROM golang:1.24.13-alpine AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
-RUN go mod download
+COPY pkg/ ./pkg/
+COPY services/reminder-service/ ./services/reminder-service/
 
-COPY . .
+WORKDIR /app/services/reminder-service
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./cmd/main.go
+RUN GOWORK=off go mod download
+
+RUN CGO_ENABLED=0 GOOS=linux GOWORK=off go build -o /main ./cmd/main.go
 
 FROM alpine:latest
 
 WORKDIR /app
 
-# Копируем бинарник и конфиг
 COPY --from=builder /main .
-COPY ./config/config.yaml ./config/
+COPY services/reminder-service/config/ ./config/
 
 EXPOSE 8081
 
-CMD ["./main"]
+CMD ["sh", "-c", "./main -config ./config/${APP_ENV}.yaml"]

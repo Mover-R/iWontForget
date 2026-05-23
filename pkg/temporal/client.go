@@ -1,5 +1,13 @@
 package temporal
 
-func NewTemporalClient(conf *TemporalConfig) error {
-	return nil
+import (
+	"go.temporal.io/sdk/client"
+)
+
+func NewTemporalClient(conf *TemporalConfig) (client.Client, error) {
+	client, err := client.NewClient(client.Options{
+		HostPort:  conf.Address,
+		Namespace: conf.Namespace,
+	})
+	return client, err
 }
