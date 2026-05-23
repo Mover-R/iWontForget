@@ -1,0 +1,5 @@
+temporal:
+  address: "temporal:7233"
+  namespace: "default"
+  queues:
+    reminder: "reminder-task-queue"

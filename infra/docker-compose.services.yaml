@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  reminder:
+    build:
+      context: ..
+      dockerfile: services/reminder-service/Dockerfile
+    environment:
+      - APP_ENV=local
+    ports:
+      - "50001:50001"
+    networks:
+      - iwf-app-network
+networks:
+  iwf-app-network:
+    external: true
