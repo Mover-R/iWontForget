@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 
-	grpczap "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"google.golang.org/grpc"
 
@@ -32,12 +31,12 @@ func NewServer(cfg Config, opts ...Option) *Server {
 
 	grpcOpts := []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
-			recovery.UnaryServerInterceptor(),           // panic → error
-			grpczap.UnaryServerInterceptor(s.log.Zap()), // логирование
+			recovery.UnaryServerInterceptor(), // panic → error
+			//grpczap.UnaryServerInterceptor(s.log.Zap()), // логирование
 		),
 		grpc.ChainStreamInterceptor(
 			recovery.StreamServerInterceptor(),
-			grpczap.StreamServerInterceptor(s.log.Zap()),
+			//grpczap.StreamServerInterceptor(s.log.Zap()),
 		),
 	}
 	s.server = grpc.NewServer(grpcOpts...)
